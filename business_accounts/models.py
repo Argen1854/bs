@@ -3,10 +3,11 @@ from user.models import User
 
 
 
-class BusinessAccounts(models.Model):
+class BusinessAccount(models.Model):
     admin = models.ForeignKey(User, on_delete=models.CASCADE)
     title = models.CharField(max_length=100)
-    # work_time 
+    start_time = models.CharField(max_length=5)
+    end_time = models.CharField(max_length=5)
     address = models.CharField(max_length=100)
     phone_number = models.IntegerField()
     email = models.CharField(max_length=100)
@@ -16,7 +17,7 @@ class BusinessAccounts(models.Model):
 
     @property
     def services(self):
-        review = SalonServices.objects.filter(businessaccounts = self)
+        review = SalonService.objects.filter(businessaccounts = self)
         return [{'id': i.id, 'title': i.title,} for i in review]
 
     @property
@@ -30,7 +31,7 @@ class BusinessAccounts(models.Model):
 
     @property
     def reviews(self):
-        reviews = SalonReviews.objects.filter(businessaccounts = self)
+        reviews = SalonReview.objects.filter(businessaccounts = self)
         return [{'id': i.id, 'text': i.text, 'stars': i.stars, 'user_id': i.user.id, 'user_name': i.user.name} for i in reviews]
     
     
@@ -42,8 +43,8 @@ STARS = [
         ('4', 4),
         ('5', 5)
     ]
-class SalonReviews(models.Model):
-    salon = models.ForeignKey(BusinessAccounts, on_delete=models.CASCADE, related_name='salon_reviews')
+class SalonReview(models.Model):
+    salon = models.ForeignKey(BusinessAccount, on_delete=models.CASCADE, related_name='salon_reviews')
     text = models.TextField()
     stars = models.CharField(max_length=100, choices=STARS, null=True)
 
@@ -58,22 +59,22 @@ SERVICE_TYPE = [
     ('Фиксированная','Фиксированная'),
     ('Динамеческая', 'Динамечиская')
 ]
-class SalonServices(models.Model):
+class SalonService(models.Model):
     title = models.CharField(max_length=100, choices=SERVICE_TITLE)
     type = models.CharField(max_length=100, choices=SERVICE_TYPE)
-    time = models.TimeField()
-    # price = models.IntegerField() 
+    duration = models.CharField(max_length=5)
+    price = models.IntegerField() 
+    price_2 = models.IntegerField(null=True, blank=True)
     # Цена зависит от типа если динамическая то цена от и до а если фиксированная тогда фиксированная
-    # делайте как считаете нужным удачи с нервами Радомир
-    #                                                            Диер!!!!
+    # Поэтому две цены если фиксированная тогда выводим только 1 а если динамическая тогда 2 от и до 
 
-    salon = models.ForeignKey(BusinessAccounts, on_delete=models.CASCADE, related_name='salon_services')
+    salon = models.ForeignKey(BusinessAccount, on_delete=models.CASCADE, related_name='salon_services')
 
     def __str__(self):
         return self.title
 
 class Staff(models.Model):
-    salon = models.ForeignKey(BusinessAccounts, on_delete=models.CASCADE, null=True)
+    salon = models.ForeignKey(BusinessAccount, on_delete=models.CASCADE, null=True)
     # avatar = models.ImageField()
     name = models.CharField(max_length=100)
     phone_number = models.IntegerField()
@@ -90,7 +91,7 @@ class Staff(models.Model):
 
     @property
     def reviews(self):
-        reviews = StaffReviews.objects.filter(staff = self)
+        reviews = StaffReview.objects.filter(staff = self)
         return [{'id': i.id, 'text': i.text, 'stars': i.stars, 'user_id': i.user.id, 'user_name': i.user.name} for i in reviews]
 
 
@@ -122,10 +123,17 @@ class Interior(models.Model):
 
 
 
-class StaffReviews(models.Model):
+class StaffReview(models.Model):
     staff = models.ForeignKey(Staff, on_delete=models.CASCADE, related_name='staff_reviews')
     text = models.TextField()
 
     stars = models.CharField(max_length=100, choices=STARS, null=True)
     
     user = models.ForeignKey(User, on_delete=models.CASCADE)
+
+
+
+
+
+
+
