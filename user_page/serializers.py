@@ -15,9 +15,8 @@ class CreateRecordsAPIViewSerializer(serializers.Serializer):
     user_id = serializers.IntegerField()
 
     data = serializers.DateField()
-    time = serializers.CharField(max_length=5)
+    time = serializers.TimeField()
     price = serializers.IntegerField()
-    promo_code = serializers.CharField(max_length=10)
 
     staff_id = serializers.IntegerField()
     service_id = serializers.IntegerField()

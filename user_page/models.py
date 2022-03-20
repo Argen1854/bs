@@ -9,17 +9,17 @@ from user.models import User
 
 
 STATUS_TYPE = [
-    (1, "На прием"),
-    (2, "Подтвержден")
+    ("На прием", "На прием"),
+    ("Подтвержден", "Подтвержден")
 ]
 class Records(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
 
     data = models.DateField()
-    time = models.CharField(max_length=5, null=True, blank=True)
+    time = models.TimeField()
     price = models.IntegerField()
     promo_code = models.CharField(max_length=10, null=True, blank=True)
-    status = models.CharField(choices=STATUS_TYPE, max_length=50, default=1)
+    status = models.CharField(choices=STATUS_TYPE, max_length=100, default="На прием")
 
     staff = models.ForeignKey(Staff, on_delete=models.CASCADE)
     service = models.ForeignKey(SalonService, on_delete=models.CASCADE)

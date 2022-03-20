@@ -9,8 +9,9 @@ class BusinessAccount(models.Model):
     start_time = models.CharField(max_length=5)
     end_time = models.CharField(max_length=5)
     address = models.CharField(max_length=100)
-    phone_number = models.IntegerField()
+    phone_number = models.CharField(max_length=50)
     email = models.CharField(max_length=100)
+    avatar = models.ImageField(upload_to="")
     
     def __str__(self):
         return self.title
@@ -51,18 +52,18 @@ class SalonReview(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
 
 
-SERVICE_TITLE =[
-    ('B', 'B'),
-    ('C', 'C')
-]
+# SERVICE_TITLE =[
+#     ('B', 'B'),
+#     ('C', 'C')
+# ]
 SERVICE_TYPE = [
     ('Фиксированная','Фиксированная'),
     ('Динамеческая', 'Динамечиская')
 ]
 class SalonService(models.Model):
-    title = models.CharField(max_length=100, choices=SERVICE_TITLE)
+    title = models.CharField(max_length=100)
     type = models.CharField(max_length=100, choices=SERVICE_TYPE)
-    duration = models.CharField(max_length=5)
+    duration = models.TimeField()
     price = models.IntegerField() 
     price_2 = models.IntegerField(null=True, blank=True)
     # Цена зависит от типа если динамическая то цена от и до а если фиксированная тогда фиксированная
@@ -75,9 +76,9 @@ class SalonService(models.Model):
 
 class Staff(models.Model):
     salon = models.ForeignKey(BusinessAccount, on_delete=models.CASCADE, null=True)
-    # avatar = models.ImageField()
+    avatar = models.ImageField(upload_to="")
     name = models.CharField(max_length=100)
-    phone_number = models.IntegerField()
+    phone_number = models.CharField(max_length=50)
     service_type = models.CharField(max_length=100)
     work_experience = models.CharField(max_length=100)
     review = models.TextField()
@@ -95,16 +96,22 @@ class Staff(models.Model):
         return [{'id': i.id, 'text': i.text, 'stars': i.stars, 'user_id': i.user.id, 'user_name': i.user.name} for i in reviews]
 
 
-
+Monday = 0
+Tuesday = 1
+Wednesday = 2
+Thursday = 3
+Friday = 4
+Saturday = 5
+Sunday = 6
 class StaffTimetable(models.Model):
     DAYS_OF_WEEK = (
-        (1, 'Monday'),
-        (2, 'Tuesday'),
-        (3, 'Wednesday'),
-        (4, 'Thursday'),
-        (5, 'Friday'),
-        (6, 'Saturday'),
-        (7, 'Sunday')
+        (Monday, 'Monday'),
+        (Tuesday, 'Tuesday'),
+        (Wednesday, 'Wednesday'),
+        (Thursday, 'Thursday'),
+        (Friday, 'Friday'),
+        (Saturday, 'Saturday'),
+        (Sunday, 'Sunday')
     )
     DAY_TYPES = (
         ('weekday', 'weekday'),
@@ -113,15 +120,18 @@ class StaffTimetable(models.Model):
     staff = models.ForeignKey(Staff, on_delete=models.CASCADE)
 
     day_week = models.PositiveIntegerField(choices=DAYS_OF_WEEK)
-    start_time = models.CharField(max_length=5)
-    end_time = models.CharField(max_length=5)
+    start_time = models.TimeField()
+    end_time = models.TimeField()
     day_type = models.CharField(max_length=255,choices=DAY_TYPES)
 
 
 class Interior(models.Model):
-    pass
+    salon = models.ForeignKey(BusinessAccount, on_delete=models.CASCADE)
+    image = models.ImageField(upload_to="")
 
-
+class StaffWork(models.Model):
+    salon = models.ForeignKey(BusinessAccount, on_delete=models.CASCADE)
+    image = models.ImageField(upload_to="")
 
 class StaffReview(models.Model):
     staff = models.ForeignKey(Staff, on_delete=models.CASCADE, related_name='staff_reviews')
@@ -130,10 +140,3 @@ class StaffReview(models.Model):
     stars = models.CharField(max_length=100, choices=STARS, null=True)
     
     user = models.ForeignKey(User, on_delete=models.CASCADE)
-
-
-
-
-
-
-
